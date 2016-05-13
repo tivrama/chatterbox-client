@@ -1,0 +1,17 @@
+{
+  "name": "chatterbox",
+  "version": "0.0.0",
+  "dependencies": {
+    "jquery": "~2.0.3"/* START SOLUTION */,
+    "underscore": "~1.8.3",
+    "backbone": "~1.2.1"
+    /* END SOLUTION */
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
