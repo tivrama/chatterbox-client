@@ -40,11 +40,18 @@ var app = {
       type: 'GET',
       contentType: 'application/JSON',
       success: function(data) {
-        // console.log('chatterbox: message received');
+        // console.log(data.results);
         // console.log('get data before stringify, ', data);
         app.data = data;
         // console.log(JSON.stringify(data));
         // $('#chats').append(JSON.stringify(data).replace('setInterval', ''));
+
+        data['results'] = data['results'].sort(function(a,b) {
+          return a.createdAt < b.createdAt ? -1 : 1;
+        });
+
+        console.log('sorted data:', data['results']);
+
         app.sortData(data)
       },
 
@@ -103,12 +110,16 @@ var app = {
   },
 
   addFriend: function(username) {
-    console.log('hello');
     app.friends.push(username);
+    app.friends = _.uniq(app.friends);
   },
 
 
+  handleSubmit: function(message) {
+    app.send(message);
+    app.fetch();
 
+  },
 
 
 
@@ -121,13 +132,17 @@ $(document).ready(function() {
     app.clearMessages();
   });
 
-  $('.username').on('click', function() {
-    console.log('test');
-    app.addFriend();
+  $('#main').on('click', '.username', function() {
+    app.addFriend(this.textContent);
+    console.log(app.friends);
   });
 
-  $('.username').text('testing!');
-
+  $('.submit').on('click', function(e) {
+    e.preventDefault();
+    console.log('hello');
+    var msg = $('#message').val();
+    app.handleSubmit(msg);
+  });
 
 
 });
