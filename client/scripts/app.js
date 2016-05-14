@@ -47,7 +47,7 @@ var app = {
       contentType: 'application/json; charset=utf-8',
       data: 'order=-createdAt',
       success: function(data) {
-        // app.data = data;
+        app.data = data;
         // data['results'] = data['results'].sort(function(a,b) {
         //   return a.createdAt < b.createdAt ? -1 : 1;
         // });
@@ -67,8 +67,19 @@ var app = {
     var node = {
       username: '',
       date: '',
-      message: ''
+      message: '',
+      room: ''
     };
+
+    var entityMap = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': '&quot;',
+      "'": '&#39;',
+      "/": '&#x2F;'
+    };
+
     //loop through data
     var chats = data.results;
     for (var i = 0; i < chats.length; i++) {
@@ -76,19 +87,24 @@ var app = {
         if (k === 'username') {
           node.username = chats[i][k];
         }
-        else if ( k === 'createdAt') {
+        else if (k === 'createdAt') {
           node.date = chats[i][k];
         }
-        else if ( k === 'text') {
+        else if (k === 'roomname') {
+          node.room = chats[i][k];
+        }
+        else if (k === 'text') {
           // node.message = JSON.stringify(chats[i][k]).replace('setInterval', '');
-          node.message = JSON.stringify(chats[i][k]);
-          node.message = chats[i][k];
+          node.message = JSON.stringify(chats[i][k]).replace(/[&<>"'\/]/g, function(char) {
+            return entityMap[char];
+          });
           // .escape("&<>\"'`!@$%()=+{}[]")
         }
         var msg = $('<div>').addClass('message');
         msg.append($('<h3>').text(node.username).addClass('username'));
         msg.append($('<p>').text(node.message));
         msg.append($('<p>').text(node.date));
+        msg.append($('<p>').text(node.room));
 
         $("#chats").append(msg);
       }
