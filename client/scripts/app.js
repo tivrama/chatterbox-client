@@ -7,6 +7,9 @@ var app = {
   data: {},
   friends: [],
   server: 'https://api.parse.com/1/classes/chatterbox',
+  userName: (window.location.search).match(/(&|\?)username=(.+)/)[2],
+// sort: {'createdAt': -1},
+
 
   init: function(){
     app.fetch();
@@ -21,9 +24,12 @@ var app = {
       type: 'POST',
       //add linter to prevent illegal messages
       data: JSON.stringify(message),
-      contentType: 'application/json',
+      dataType: 'json',
+      contentType: 'application/json; charset=utf-8',
       success: function (data) {
-        console.log('chatterbox: Message sent. Message: ', message);
+        // console.log('chatterbox: Message sent. Message: ', message);
+        app.clearMessages();
+        app.fetch();
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -38,17 +44,13 @@ var app = {
     $.ajax({
       url: app.server,
       type: 'GET',
-      contentType: 'application/JSON',
+      contentType: 'application/json; charset=utf-8',
+      data: 'order=-createdAt',
       success: function(data) {
-        // console.log(data.results);
-        // console.log('get data before stringify, ', data);
-        app.data = data;
-        // console.log(JSON.stringify(data));
-        // $('#chats').append(JSON.stringify(data).replace('setInterval', ''));
-
-        data['results'] = data['results'].sort(function(a,b) {
-          return a.createdAt < b.createdAt ? -1 : 1;
-        });
+        // app.data = data;
+        // data['results'] = data['results'].sort(function(a,b) {
+        //   return a.createdAt < b.createdAt ? -1 : 1;
+        // });
 
         console.log('sorted data:', data['results']);
 
@@ -75,10 +77,13 @@ var app = {
           node.username = chats[i][k];
         }
         else if ( k === 'createdAt') {
-        node.date = chats[i][k];
+          node.date = chats[i][k];
         }
         else if ( k === 'text') {
-        node.message = JSON.stringify(chats[i][k]).replace('setInterval', '');
+          // node.message = JSON.stringify(chats[i][k]).replace('setInterval', '');
+          node.message = JSON.stringify(chats[i][k]);
+          node.message = chats[i][k];
+          // .escape("&<>\"'`!@$%()=+{}[]")
         }
         var msg = $('<div>').addClass('message');
         msg.append($('<h3>').text(node.username).addClass('username'));
@@ -117,7 +122,7 @@ var app = {
 
   handleSubmit: function(message) {
     app.send(message);
-    app.fetch();
+    //app.fetch();
 
   },
 
@@ -139,9 +144,16 @@ $(document).ready(function() {
 
   $('.submit').on('click', function(e) {
     e.preventDefault();
-    console.log('hello');
     var msg = $('#message').val();
-    app.handleSubmit(msg);
+    var newMsg = {
+      text: msg,
+      //createdAt: new Date(),
+      roomname: 'lobby',
+      username: app.userName
+      //updatedAt: new Date()
+    };
+    console.log(newMsg);
+    app.handleSubmit(newMsg);
   });
 
 
