@@ -85,6 +85,23 @@ var app = {
   },
 
   renderMessage: function(message) {
+    //Linting
+    var entityMap = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': '&quot;',
+      "'": '&#39;',
+      "/": '&#x2F;'
+    };
+    function escapeHtml(string) {
+      return String(string).replace(/[&<>"'\/]/g, function (s) {
+        return entityMap[s];
+      });
+    }
+    message.username = escapeHtml(message.username);
+    message.text = escapeHtml(message.text);
+
     var $user = $("<div>",{class: 'user'}).text(message.username);
     var $text = $("<div>", {class:'text'}).text(message.text);
     var $message = $("<div>", {class: 'chat', 'data-id': message.objectId}).append($user, $text);
